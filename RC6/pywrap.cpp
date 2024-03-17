@@ -5,14 +5,19 @@
 namespace py = pybind11;
 constexpr auto byref = py::return_value_policy::reference_internal;
 
-PYBIND11_MODULE(MyLib, m) {
+PYBIND11_MODULE(Cypher, m) {
     m.doc() = "Pybind11 plugin for RC6 encryption and decryption";
 
+    py::enum_<RC6::Mode>(m, "Mode")
+            .value("ECB", RC6::Mode::ECB)
+            .value("CBC", RC6::Mode::CBC)
+            .export_values();
+
     py::class_<RC6>(m, "RC6")
-            .def(py::init([](const py::bytes& key, uint32_t rounds) {
+            .def(py::init([](const py::bytes& key, uint32_t rounds, RC6::Mode mode) {
                 std::string keyStr = key; // Implicit conversion from py::bytes to std::string
                 std::vector<uint8_t> keyVec(keyStr.begin(), keyStr.end());
-                return new RC6(keyVec, rounds);
+                return new RC6(keyVec, rounds, mode);
             }))
             .def("encrypt", [](RC6& self, const py::bytes& plaintext, const py::bytes& iv) {
                 std::string plaintextStr = plaintext; // Convert py::bytes to std::string
