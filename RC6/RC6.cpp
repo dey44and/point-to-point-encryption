@@ -176,9 +176,20 @@ std::vector<uint8_t> RC6::decrypt(const std::vector<uint8_t>& ciphertext, const 
     }
 
     // Remove PKCS#7 padding
-    size_t padding_length = decrypted.back();
-    if (padding_length <= block_size) {
-        decrypted.resize(decrypted.size() - padding_length);
+    if (!decrypted.empty()) {
+        size_t padding_length = decrypted.back();
+        if (padding_length > 0 && padding_length <= block_size) {
+            bool valid_padding = true;
+            for (size_t i = decrypted.size() - padding_length; i < decrypted.size(); ++i) {
+                if (decrypted[i] != padding_length) {
+                    valid_padding = false;
+                    break;
+                }
+            }
+            if (valid_padding) {
+                decrypted.resize(decrypted.size() - padding_length);
+            }
+        }
     }
 
     return decrypted;

@@ -1,4 +1,7 @@
-6
+7
+plaintext: 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+user key: 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+ciphertext: 3a 96 f9 c7 F6 75 5C FE 46 F0 0E 3D CD 5D 2A 3C
 plaintext: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 user key: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 ciphertext: 8f c3 a5 36 56 b1 f7 78 c1 29 df 4e 98 48 a4 1e
