@@ -1,0 +1,60 @@
+Test #1
+Encryption test:
+HEX: 8f c3 a5 36 56 b1 f7 78 c1 29 df 4e 98 48 a4 1e 
+HEX: 8f c3 a5 36 56 b1 f7 78 c1 29 df 4e 98 48 a4 1e 
+PASSED
+Decryption test:
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+PASSED
+
+Test #2
+Encryption test:
+HEX: 52 4e 19 2f 47 15 c6 23 1f 51 f6 36 7e a4 3f 18 
+HEX: 52 4e 19 2f 47 15 c6 23 1f 51 f6 36 7e a4 3f 18 
+PASSED
+Decryption test:
+HEX: 02 13 24 35 46 57 68 79 8a 9b ac bd ce df e0 f1 
+HEX: 02 13 24 35 46 57 68 79 8a 9b ac bd ce df e0 f1 
+PASSED
+
+Test #3
+Encryption test:
+HEX: 6c d6 1b cb 19 0b 30 38 4e 8a 3f 16 86 90 ae 82 
+HEX: 6c d6 1b cb 19 0b 30 38 4e 8a 3f 16 86 90 ae 82 
+PASSED
+Decryption test:
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+PASSED
+
+Test #4
+Encryption test:
+HEX: 68 83 29 d0 19 e5 05 04 1e 52 e9 2a f9 52 91 d4 
+HEX: 68 83 29 d0 19 e5 05 04 1e 52 e9 2a f9 52 91 d4 
+PASSED
+Decryption test:
+HEX: 02 13 24 35 46 57 68 79 8a 9b ac bd ce df e0 f1 
+HEX: 02 13 24 35 46 57 68 79 8a 9b ac bd ce df e0 f1 
+PASSED
+
+Test #5
+Encryption test:
+HEX: 8f 5f bd 05 10 d1 5f a8 93 fa 3f da 6e 85 7e c2 
+HEX: 8f 5f bd 05 10 d1 5f a8 93 fa 3f da 6e 85 7e c2 
+PASSED
+Decryption test:
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+PASSED
+
+Test #6
+Encryption test:
+HEX: c8 24 18 16 f0 d7 e4 89 20 ad 16 a1 67 4e 5d 48 
+HEX: c8 24 18 16 f0 d7 e4 89 20 ad 16 a1 67 4e 5d 48 
+PASSED
+Decryption test:
+HEX: 02 13 24 35 46 57 68 79 8a 9b ac bd ce df e0 f1 
+HEX: 02 13 24 35 46 57 68 79 8a 9b ac bd ce df e0 f1 
+PASSED
+

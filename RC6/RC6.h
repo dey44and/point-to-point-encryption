@@ -21,7 +21,7 @@ private:
     uint32_t rounds;
     uint32_t w = 32;
     uint32_t log_w = (uint32_t)std::log2(w);
-    int64_t modulo = (int64_t)std::pow(2, w);
+    uint64_t modulo = (int64_t)std::pow(2, w);
     std::vector<uint32_t> S;
     std::vector<uint8_t> key;
     Mode mode; // Mode of operation

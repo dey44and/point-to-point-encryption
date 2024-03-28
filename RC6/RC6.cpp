@@ -20,13 +20,13 @@ void RC6::key_schedule() {
     uint32_t c = std::max(1u, b / u);
     std::vector<uint32_t> L(c);
 
-    for(uint32_t i = 0; i < b; ++i) {
-        L[i / u] = (L[i / u] << 8) + key[i];
+    for(int32_t i = (int32_t)b - 1; i >= 0; --i) {
+        L[i / u] = ((L[i / u] << 8) + key[i]) % modulo;
     }
 
     S.resize(2 * rounds + 4);
     for(uint32_t i = 0; i < 2 * rounds + 4; ++i) {
-        S[i] = ((uint64_t)P + (uint64_t)i * Q) % modulo;
+        S[i] = ((uint64_t)P + 1ULL * (uint64_t)i * Q) % modulo;
     }
 
     uint32_t v = 3 * std::max(c, (uint32_t)S.size());
@@ -56,19 +56,19 @@ std::vector<uint32_t> RC6::_encrypt_block(const std::vector<uint8_t>& plaintext)
     std::vector<uint32_t> state(4);
     std::memcpy(&state[0], &plaintext[0], block_size);
 
-    state[1] += S[0];
-    state[3] += S[1];
+    state[1] = (state[1] + S[0]) % modulo;
+    state[3] = (state[3] + S[1]) % modulo;
     for (uint32_t i = 1; i <= rounds; ++i) {
-        uint32_t t = _lshift((state[1] * (2 * state[1] + 1)) % modulo, log2(w));
-        uint32_t u = _lshift((state[3] * (2 * state[3] + 1)) % modulo, log2(w));
-        state[0] = _lshift((state[0] ^ t), u) + S[2 * i];
-        state[2] = _lshift((state[2] ^ u), t) + S[2 * i + 1];
+        uint32_t t = _lshift((1ULL * state[1] * (2ULL * state[1] + 1)) % modulo, log2(w));
+        uint32_t u = _lshift((1ULL * state[3] * (2ULL * state[3] + 1)) % modulo, log2(w));
+        state[0] = (_lshift((state[0] ^ t), u) + S[2 * i]) % modulo;
+        state[2] = (_lshift((state[2] ^ u), t) + S[2 * i + 1]) % modulo;
         std::swap(state[0], state[1]);
         std::swap(state[2], state[3]);
         std::swap(state[1], state[3]);
     }
-    state[0] += S[2 * rounds + 2];
-    state[2] += S[2 * rounds + 3];
+    state[0] = (state[0] + S[2 * rounds + 2]) % modulo;
+    state[2] = (state[2] + S[2 * rounds + 3]) % modulo;
     return state;
 }
 
@@ -76,19 +76,19 @@ std::vector<uint32_t> RC6::_decrypt_block(const std::vector<uint8_t>& ciphertext
     std::vector<uint32_t> state(4);
     std::memcpy(&state[0], &ciphertext[0], block_size);
 
-    state[2] -= S[2 * rounds + 3];
-    state[0] -= S[2 * rounds + 2];
+    state[2] = (state[2] - S[2 * rounds + 3] + modulo) % modulo;
+    state[0] = (state[0] - S[2 * rounds + 2] + modulo) % modulo;
     for (uint32_t i = rounds; i > 0; --i) {
         std::swap(state[0], state[1]);
         std::swap(state[2], state[3]);
         std::swap(state[0], state[2]);
-        uint32_t u = _lshift((state[3] * (2 * state[3] + 1)) % modulo, 5);
-        uint32_t t = _lshift((state[1] * (2 * state[1] + 1)) % modulo, 5);
-        state[2] = _rshift((state[2] - S[2 * i + 1]) % modulo, t) ^ u;
-        state[0] = _rshift((state[0] - S[2 * i]) % modulo, u) ^ t;
+        uint32_t u = _lshift((1ULL * state[3] * (2 * state[3] + 1)) % modulo, 5);
+        uint32_t t = _lshift((1ULL * state[1] * (2 * state[1] + 1)) % modulo, 5);
+        state[2] = _rshift((state[2] - S[2 * i + 1] + modulo) % modulo, t) ^ u;
+        state[0] = _rshift((state[0] - S[2 * i] + modulo) % modulo, u) ^ t;
     }
-    state[3] -= S[1];
-    state[1] -= S[0];
+    state[3] = (state[3] - S[1] + modulo) % modulo;
+    state[1] = (state[1] - S[0] + modulo) % modulo;
     return state;
 }
 
@@ -97,8 +97,16 @@ std::vector<uint8_t> RC6::encrypt(const std::vector<uint8_t>& plaintext, const s
     std::vector<uint8_t> previous_block(iv);
 
     if (mode == Mode::ECB) {
-        for (size_t i = 0; i < plaintext.size(); i += block_size) {
-            std::vector<uint8_t> block_to_encrypt(plaintext.begin() + i, plaintext.begin() + i + block_size);
+        // Calculate padding length
+        size_t padding_length = (block_size - (plaintext.size() % block_size)) % block_size;
+        // Append padding
+        std::vector<uint8_t> padded_plaintext = plaintext;
+        for (size_t i = 0; i < padding_length; ++i) {
+            padded_plaintext.push_back(static_cast<uint8_t>(padding_length));
+        }
+
+        for (size_t i = 0; i < padded_plaintext.size(); i += block_size) {
+            std::vector<uint8_t> block_to_encrypt(padded_plaintext.begin() + i, padded_plaintext.begin() + i + block_size);
             std::vector<uint32_t> encrypted_block = _encrypt_block(block_to_encrypt);
             for (uint32_t value : encrypted_block) {
                 for (int j = 0; j < 4; ++j) {
@@ -107,8 +115,16 @@ std::vector<uint8_t> RC6::encrypt(const std::vector<uint8_t>& plaintext, const s
             }
         }
     } else if (mode == Mode::CBC) {
-        for (size_t i = 0; i < plaintext.size(); i += block_size) {
-            std::vector<uint8_t> block_to_encrypt(plaintext.begin() + i, plaintext.begin() + i + block_size);
+        // Calculate padding length
+        size_t padding_length = block_size - (plaintext.size() % block_size);
+        // Append padding
+        std::vector<uint8_t> padded_plaintext = plaintext;
+        for (size_t i = 0; i < padding_length; ++i) {
+            padded_plaintext.push_back(static_cast<uint8_t>(padding_length));
+        }
+
+        for (size_t i = 0; i < padded_plaintext.size(); i += block_size) {
+            std::vector<uint8_t> block_to_encrypt(padded_plaintext.begin() + i, padded_plaintext.begin() + i + block_size);
             for (size_t j = 0; j < block_size; ++j) {
                 block_to_encrypt[j] ^= previous_block[j];
             }
@@ -159,5 +175,12 @@ std::vector<uint8_t> RC6::decrypt(const std::vector<uint8_t>& ciphertext, const 
         }
     }
 
+    // Remove PKCS#7 padding
+    size_t padding_length = decrypted.back();
+    if (padding_length <= block_size) {
+        decrypted.resize(decrypted.size() - padding_length);
+    }
+
     return decrypted;
 }
+
