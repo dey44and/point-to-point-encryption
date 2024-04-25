@@ -4,12 +4,12 @@ from datetime import datetime
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtGui import QStandardItemModel, QTextCursor, QTextBlockFormat
+from PyQt5.QtGui import QStandardItemModel, QTextCursor, QTextBlockFormat, QDesktopServices
 from PyQt5.QtWidgets import (QMainWindow, QDialog, QFileDialog)
 from PyQt5.uic import loadUi
 
 from client.connection import Peer
-from data_dialog import DataInputDialog
+from messengerApp.data_dialog import DataInputDialog
 from messengerApp.ip_dialog import IPInputDialog
 
 
@@ -51,10 +51,18 @@ class MainWindow(QMainWindow):
         self.pushButton.clicked.connect(self.send_message_clicked)
         self.fileButton.clicked.connect(self.open_file_clicked)
         self.findPeerButton.clicked.connect(self.add_peer_clicked)
+        self.textBrowser.anchorClicked.connect(self.link_clicked)
 
         """ Initialize the fields """
         self.__peer = None
         self.config_connection()
+
+    def link_clicked(self, url):
+        if url.scheme() == 'file':
+            QDesktopServices.openUrl(url)
+            file_name = f"{self.__selected_item.text()}.txt"
+            file_path = os.path.join("chat", self._name, file_name)
+            self.update_chat(file_path)
 
     def add_peer_clicked(self):
         ip_dialog = IPInputDialog()
@@ -97,7 +105,7 @@ class MainWindow(QMainWindow):
                     self.__peer.send_peer_file(peer_ip, peer_port, "send_file", binary_data)
                 # At the end, announce finished
                 self.__peer.send_peer_file(peer_ip, peer_port, "stop_file", "empty")
-                self.save_message(peer_ip, peer_port, nickname, self._name, f"Sent file: {filename}")
+                self.save_message(peer_ip, peer_port, nickname, f"{self._name} sent file", new_filename)
         except IOError as e:
             print("[ERROR] ", e)
 
@@ -163,7 +171,7 @@ class MainWindow(QMainWindow):
             with open(file_path, "r") as file:
                 for line in file:
                     sender, message = line.strip().split(": ", 1)
-                    alignment = Qt.AlignRight if sender == self._name else Qt.AlignLeft
+                    alignment = Qt.AlignRight if sender.startswith(self._name) else Qt.AlignLeft
 
                     # Create a new QTextCursor at the end of the document
                     cursor = self.textBrowser.textCursor()
@@ -178,7 +186,18 @@ class MainWindow(QMainWindow):
                     cursor.setBlockFormat(block_format)
 
                     # Insert the message text
-                    cursor.insertText(f"{sender}:\n{message}")
+
+                    if sender.endswith("sent file") and not sender.startswith(self._name):
+                        cursor.insertText(f"{sender}:\n")
+                        sender_name, _ = sender.split(" ", 1)
+                        script_dir = os.path.dirname(os.path.realpath(__file__))
+                        file_path = os.path.join(script_dir, "chat", self._name, message)
+                        print(f"[INFO] Saving message to {file_path}.")
+                        # HTML format for the link
+                        link_html = f'<a href="file://{file_path}">{message}</a>'
+                        cursor.insertHtml(link_html)
+                    else:
+                        cursor.insertText(f"{sender}:\n{message}")
                     cursor.insertHtml("<hr style='background-color: white; height: 2px; border: 0;'>\n")
 
                     # Move the cursor to the end of the document

@@ -127,7 +127,7 @@ class Peer:
         elif command_type == 'stop_file':
             filename = self.__files[addr]
             peer_ip, peer_port = addr
-            worker = Worker(peer_ip, peer_port, nickname, nickname, f"Sent file: {filename}")
+            worker = Worker(peer_ip, peer_port, nickname, f"{nickname} sent file", filename)
             worker.update_message.connect(self.__main_window.save_message)
             thread = threading.Thread(target=worker.run)
             thread.start()
