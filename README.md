@@ -156,7 +156,7 @@ This section explains the packet formats with size of 512 bytes used for UDP com
 
 | Command           | Description         | Format                                                |
 |-------------------|---------------------|-------------------------------------------------------|
-| discovery         | Discovery request   | `discovery=username;message=peer1_public_key`         |
+| discovery         | Discovery request   | `discovery=username;message=empty`                    |
 | confirm_discovery | Confirm discovery   | `confirm_discovery=username;message=peer2_public_key` |
 | send_secret       | Send secret message | `send_secret=username;message=secret_key_encrypted`   |
 | send_message      | Send message        | `send_message=username;message=content`               |

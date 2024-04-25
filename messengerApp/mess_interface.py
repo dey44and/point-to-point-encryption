@@ -10,6 +10,7 @@ from PyQt5.uic import loadUi
 
 from client.connection import Peer
 from data_dialog import DataInputDialog
+from messengerApp.ip_dialog import IPInputDialog
 
 
 def debug_trace():
@@ -44,13 +45,29 @@ class MainWindow(QMainWindow):
         # Set a model for list view
         self.model = QStandardItemModel()
         self.listView.setModel(self.model)
+
+        # Add callbacks for events
         self.listView.clicked.connect(self.item_clicked)
         self.pushButton.clicked.connect(self.send_message_clicked)
         self.fileButton.clicked.connect(self.open_file_clicked)
+        self.findPeerButton.clicked.connect(self.add_peer_clicked)
 
         """ Initialize the fields """
         self.__peer = None
         self.config_connection()
+
+    def add_peer_clicked(self):
+        ip_dialog = IPInputDialog()
+        if ip_dialog.exec_() == QDialog.Accepted:
+            try:
+                # Get input values from dialog
+                ip, port = ip_dialog.get_ip_and_port()
+                self.__peer.discover_peer(ip, port, self._name)
+            except Exception as e:
+                print("[ERROR] Invalid fields!")
+                sys.exit(-1)
+        else:
+            sys.exit(0)
 
     def open_file_clicked(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "All Files (*)")
@@ -181,7 +198,7 @@ class MainWindow(QMainWindow):
 
             # Further processing with the obtained values
             self.__peer = Peer(name, '127.0.0.1', port, self)
-            self.__peer.discover_peer('127.0.0.1', 8989, name)
+            #self.__peer.discover_peer('127.0.0.1', 12345, name)
             self.__peer.start()
         else:
             sys.exit(0)

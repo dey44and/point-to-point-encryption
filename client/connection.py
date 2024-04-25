@@ -70,7 +70,6 @@ class Peer:
         command_type, nickname = command.split("=")
         if command_type == 'discovery':
             # Other user wants to discover you, get data from peer
-            _, public_key = body.split('=')
             peer_ip, peer_port = addr
 
             # Send back confirmation
@@ -138,7 +137,7 @@ class Peer:
 
     def discover_peer(self, peer_ip: str, peer_port: int, nickname: str):
         # Send a request for discovery
-        message = f"discovery={nickname};public_key={self.__public_key}"
+        message = f"discovery={nickname};message="
         self.__send_message(message, peer_ip, peer_port)
 
         print(f"[INFO] I sent a discovery message to {peer_ip}:{peer_port}")
