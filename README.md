@@ -79,3 +79,45 @@ if __name__ == '__main__':
     encrypted = rc6.encrypt(plaintext, iv)
     decrypted = rc6.decrypt(encrypted, iv)
 ```
+
+## 3. RC6 Encryption Implementation
+
+This repository contains an implementation of the RC6 encryption algorithm in C++, along with ECB (Electronic Codebook) and CBC (Cipher Block Chaining) modes. Additionally, a Python wrapper using Pybind11 allows using the C++ implementation as a library in Python.
+
+### 3.1 Introduction
+
+RC6 is a symmetric key block cipher developed by Rivest et al. It is an extension of RC5, supporting variable block sizes, key sizes, and a greater number of rounds. The algorithm is efficient and secure, making it suitable for various cryptographic applications.
+
+### 3.2 C++ Implementation
+
+The C++ implementation of RC6 includes classes for encryption and decryption, along with support for ECB and CBC modes. The implementation follows the RC6 specification, using a specified number of rounds and key size.
+
+### 3.3 Usage
+
+To use the C++ implementation of RC6, include the necessary header files and link the provided library with your application. You can then create instances of the RC6 encryption/decryption classes and use them to encrypt and decrypt data.
+
+### 3.4 Python Wrapper
+
+The Python wrapper allows using the RC6 encryption library from Python code. Pybind11 is used to generate the Python bindings for the C++ code, enabling seamless integration between C++ and Python.
+
+### 3.5 Example
+
+Below is an example demonstrating how to use the RC6 encryption library from Python:
+
+```python
+from security import Cypher
+
+# Create an instance of the RC6 encryption class
+cipher = Cypher.RC6(key=b'0123456789ABCDEF', rounds=20, Cypher.Mode.CBC)
+iv= b"E49B294B0FD7A18C22EBDE4C0C8DDD56"
+
+# Encrypt data using CBC mode
+encrypted_data = cipher.encrypt('Hello, RC6!'.encode('utf-8'), iv)
+
+# Decrypt data using CBC mode
+decrypted_data = cipher.decrypt(encrypted_data, iv)
+
+print("Original:", b'Hello, RC6!')
+print("Encrypted:", encrypted_data)
+print("Decrypted:", decrypted_data)
+```
