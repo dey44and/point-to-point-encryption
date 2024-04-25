@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
             # Further processing with the obtained values
             self.__peer = Peer(name, port, self)
 
-            self.__peer.discover_peer('127.0.0.1', 8989, name)
+            # self.__peer.discover_peer('127.0.0.1', 8989, name)
 
             self.__peer.start()
         else:
