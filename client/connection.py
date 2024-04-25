@@ -1,3 +1,4 @@
+import os
 import socket
 import threading
 import time
@@ -31,13 +32,15 @@ class Worker(QObject):
 
 
 class Peer:
-    def __init__(self, name: str, port: int, main_window: QMainWindow):
+    def __init__(self, name: str, ip: str, port: int, main_window: QMainWindow):
         self.__name = name
+        self.__ip = ip
         self.__port = port
         self.__public_key, self.__private_key = RSA.generate_keys(128)
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__socket.bind(('127.0.0.1', port))
+        self.__socket.bind((ip, port))
         self.__peers = {}  # Dictionary to store known peers
+        self.__files = {}  # Dictionary to store current file from peer
         self.__main_window = main_window
 
     def __send_message(self, message: str, peer_ip: str, peer_port: int):
@@ -106,6 +109,28 @@ class Peer:
             worker.update_message.connect(self.__main_window.save_message)
             thread = threading.Thread(target=worker.run)
             thread.start()
+        elif command_type == 'start_file':
+            _, message = body.split('=')
+            # Save file name
+            self.__files[addr] = message
+        elif command_type == 'send_file':
+            _, message = body.split("=", 1)
+            # Get filename
+            filename = self.__files[addr]
+            try:
+                file_path = os.path.join("/home/andrei-iosif/Desktop/AC 2023-2024/Securitatea Informatiei/Proiect/point-to-point-encryption/messengerApp/chat", self.__name, filename)
+                with open(file_path, "ab") as file:
+                    file.write(eval(message))
+                peer_ip, peer_port = addr
+                worker = Worker(peer_ip, peer_port, nickname, nickname, f"Sent file: {filename}")
+                worker.update_message.connect(self.__main_window.save_message)
+                thread = threading.Thread(target=worker.run)
+                thread.start()
+            except IOError as e:
+                print(f"[ERROR] Appending to file {filename}")
+        elif command_type == 'stop_file':
+            # Remove file name
+            del self.__files[addr]
 
     def discover_peer(self, peer_ip: str, peer_port: int, nickname: str):
         # Send a request for discovery
@@ -119,6 +144,11 @@ class Peer:
         # Send message
         self.__send_message(message, peer_ip, peer_port)
 
+    def send_peer_file(self, peer_ip: str, peer_port: int, message_type: str, chunk):
+        message = f"{message_type}={self.__name};message={chunk}"
+        # Send message
+        self.__send_message(message, peer_ip, peer_port)
+
     def listen(self):
         while True:
             data, addr = self.__socket.recvfrom(1024)
@@ -129,7 +159,7 @@ class Peer:
             else:
                 decoded_data = data.decode('utf-8')
 
-            command, body = decoded_data.split(';')
+            command, body = decoded_data.split(";", 1)
             self.__process_request(command, body, addr)
 
     def start(self):

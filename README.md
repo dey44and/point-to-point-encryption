@@ -121,3 +121,29 @@ print("Original:", b'Hello, RC6!')
 print("Encrypted:", encrypted_data)
 print("Decrypted:", decrypted_data)
 ```
+
+## 4. Secret Key Exchange with RC6 and RSA
+
+This section describes how to exchange a secret key for AES with RC6 using RSA encryption. This process ensures secure communication between a client and a server by establishing a shared AES key using asymmetric RSA encryption.
+
+### Key Exchange Process
+
+The key exchange process involves the following steps:
+
+1. **Client Generates AES Key**: The client generates a random AES key to be used for symmetric encryption and decryption.
+
+2. **Client Encrypts AES Key**: Using the server's RSA public key, the client encrypts the randomly generated AES key. This step ensures that only the server, possessing the corresponding private key, can decrypt the AES key.
+
+3. **Client Sends Encrypted AES Key**: The client sends the encrypted AES key to the server over the network.
+
+4. **Server Decrypts AES Key**: Upon receiving the encrypted AES key, the server decrypts it using its RSA private key. This step ensures that only the server can access the original AES key.
+
+5. **Shared AES Key**: Both the server and the client now possess the same AES key, securely exchanged through RSA encryption. This shared key can be used for symmetric encryption and decryption using algorithms like RC6.
+
+### Note on Server Authentication
+
+It's essential for the client to verify the authenticity of the server to prevent man-in-the-middle attacks. Typically, this is achieved by ensuring that the server's RSA public key is authentic and belongs to the expected server. This can be done using certificates signed by trusted authorities.
+
+### Conclusion
+
+By exchanging a secret key for AES with RC6 using RSA encryption, the client and server can establish a shared secret key securely over an insecure network. This ensures confidentiality and integrity of the communication between the client and server.

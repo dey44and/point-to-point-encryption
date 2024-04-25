@@ -2,6 +2,9 @@ from security import Cypher
 
 
 class Security(object):
+    """
+    Security class to handle security related operations.
+    """
     def __init__(self, secret_key: int, rounds: int):
         self.__secret_key = secret_key.to_bytes(128, 'big')
         self.__rounds = rounds
