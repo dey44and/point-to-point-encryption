@@ -113,6 +113,7 @@ class Peer:
             _, message = body.split('=')
             # Save file name
             self.__files[addr] = message
+            print("\n[INFO] Start file receiving.")
         elif command_type == 'send_file':
             _, message = body.split("=", 1)
             # Get filename
@@ -121,16 +122,19 @@ class Peer:
                 file_path = os.path.join("/home/andrei-iosif/Desktop/AC 2023-2024/Securitatea Informatiei/Proiect/point-to-point-encryption/messengerApp/chat", self.__name, filename)
                 with open(file_path, "ab") as file:
                     file.write(eval(message))
-                peer_ip, peer_port = addr
-                worker = Worker(peer_ip, peer_port, nickname, nickname, f"Sent file: {filename}")
-                worker.update_message.connect(self.__main_window.save_message)
-                thread = threading.Thread(target=worker.run)
-                thread.start()
+                print("[INFO] Received one chunk of data.")
             except IOError as e:
                 print(f"[ERROR] Appending to file {filename}")
         elif command_type == 'stop_file':
+            filename = self.__files[addr]
+            peer_ip, peer_port = addr
+            worker = Worker(peer_ip, peer_port, nickname, nickname, f"Sent file: {filename}")
+            worker.update_message.connect(self.__main_window.save_message)
+            thread = threading.Thread(target=worker.run)
+            thread.start()
             # Remove file name
             del self.__files[addr]
+            print("[INFO] Stop file receiving.\n")
 
     def discover_peer(self, peer_ip: str, peer_port: int, nickname: str):
         # Send a request for discovery
@@ -151,7 +155,7 @@ class Peer:
 
     def listen(self):
         while True:
-            data, addr = self.__socket.recvfrom(1024)
+            data, addr = self.__socket.recvfrom(4096)
             # When we get a new message, check if we need to decrypt message
             if addr in self.__peers:
                 security = self.__peers[addr]
