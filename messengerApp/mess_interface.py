@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
             self.read_file_binary(file_path)
             pass
 
-    def read_file_binary(self, file_path, chunk_size=128):
+    def read_file_binary(self, file_path, chunk_size=1024):
         try:
             nickname, peer_ip, peer_port = extract_peer(self.__selected_item.text())
             # Extract filename from the file path
@@ -181,9 +181,7 @@ class MainWindow(QMainWindow):
 
             # Further processing with the obtained values
             self.__peer = Peer(name, '127.0.0.1', port, self)
-
             self.__peer.discover_peer('127.0.0.1', 8989, name)
-
             self.__peer.start()
         else:
             sys.exit(0)

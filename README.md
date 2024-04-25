@@ -147,3 +147,21 @@ It's essential for the client to verify the authenticity of the server to preven
 ### Conclusion
 
 By exchanging a secret key for AES with RC6 using RSA encryption, the client and server can establish a shared secret key securely over an insecure network. This ensures confidentiality and integrity of the communication between the client and server.
+
+## 5. UDP Packet Formats
+
+This section explains the packet formats with size of 512 bytes used for UDP communication. Each packet consists of a command and associated data, formatted as `command=username;message=content`. The available command values are `discovery`, `confirm_discovery`, `send_secret`, `send_message`, `start_file`, `send_file`, and `stop_file`.
+
+## Packet Formats
+
+| Command           | Description         | Format                                                |
+|-------------------|---------------------|-------------------------------------------------------|
+| discovery         | Discovery request   | `discovery=username;message=peer1_public_key`         |
+| confirm_discovery | Confirm discovery   | `confirm_discovery=username;message=peer2_public_key` |
+| send_secret       | Send secret message | `send_secret=username;message=secret_key_encrypted`   |
+| send_message      | Send message        | `send_message=username;message=content`               |
+| start_file        | Start file transfer | `start_file=username;message=file_name`               |
+| send_file         | Send file data      | `send_file=username;message=chunk`                    |
+| stop_file         | Stop file transfer  | `stop_file=username;message=empty`                    |
+
+Each packet format consists of a command field (`command`) and a message field (`message`) separated by semicolons. The `username` field represents the sender's username, and the `content` field contains the actual message or data associated with the command.
