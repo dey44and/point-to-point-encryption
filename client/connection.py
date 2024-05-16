@@ -118,7 +118,7 @@ class Peer:
             # Get filename
             filename = self.__files[addr]
             try:
-                file_path = os.path.join("/home/andrei-iosif/Desktop/AC 2023-2024/Securitatea Informatiei/Proiect/point-to-point-encryption/messengerApp/chat", self.__name, filename)
+                file_path = os.path.join("../messengerApp/chat", self.__name, filename)
                 with open(file_path, "ab") as file:
                     file.write(eval(message))
                 print("[INFO] Received one chunk of data.")

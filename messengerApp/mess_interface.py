@@ -216,8 +216,8 @@ class MainWindow(QMainWindow):
             port = int(dialog.port_input.text())
 
             # Further processing with the obtained values
-            self.__peer = Peer(name, '127.0.0.1', port, self)
-            #self.__peer.discover_peer('127.0.0.1', 12345, name)
+            self.__peer = Peer(name, 'localhost', port, self)
+            # self.__peer.discover_peer('127.0.0.1', 12345, name)
             self.__peer.start()
         else:
             sys.exit(0)
